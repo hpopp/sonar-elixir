@@ -11,8 +11,7 @@ public class ElixirQualityProfile implements BuiltInQualityProfilesDefinition {
                 "Elixir Way", Elixir.KEY);
         profile.setDefault(true);
 
-        // Activate all rules by default
-        for (String ruleKey : ElixirRulesDefinition.ruleKeys()) {
+        for (String ruleKey : ElixirRulesDefinition.defaultProfileKeys()) {
             profile.activateRule(ElixirRulesDefinition.REPOSITORY_KEY, ruleKey);
         }
 

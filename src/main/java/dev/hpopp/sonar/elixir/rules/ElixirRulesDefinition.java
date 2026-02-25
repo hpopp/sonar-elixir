@@ -10,65 +10,22 @@ public class ElixirRulesDefinition implements RulesDefinition {
         public static final String REPOSITORY_NAME = "Elixir Analyzer";
 
         private static final List<RuleDefinition> RULES = List.of(
-                        // Code smells
-                        new RuleDefinition("S001", "FunctionComplexity",
-                                        "Function cognitive complexity should not be too high",
-                                        "CODE_SMELL", "MAJOR"),
-                        new RuleDefinition("S002", "LongFunction",
-                                        "Functions should not have too many lines",
-                                        "CODE_SMELL", "MAJOR"),
-                        new RuleDefinition("S003", "TooManyParameters",
-                                        "Functions should not have too many parameters",
-                                        "CODE_SMELL", "MAJOR"),
-                        new RuleDefinition("S004", "NestingDepth",
-                                        "Control flow statements should not be nested too deeply",
-                                        "CODE_SMELL", "MAJOR"),
-                        new RuleDefinition("S005", "MissingModuledoc",
-                                        "Modules should have @moduledoc",
-                                        "CODE_SMELL", "MINOR"),
-                        new RuleDefinition("S006", "LargeModule",
-                                        "Modules should not have too many lines",
-                                        "CODE_SMELL", "MAJOR"),
-                        new RuleDefinition("S007", "PipeChainStart",
-                                        "Pipe chains should start with a raw value",
-                                        "CODE_SMELL", "MINOR"),
-                        new RuleDefinition("S008", "SingleClauseWith",
-                                        "with statements should have more than one clause",
-                                        "CODE_SMELL", "MINOR"),
-                        new RuleDefinition("S009", "IoInspect",
-                                        "IO.inspect calls should be removed",
-                                        "CODE_SMELL", "MAJOR"),
+                        new RuleDefinition("S001", "Modules should have a @moduledoc attribute",
+                                        "Add @moduledoc to document this module's purpose",
+                                        "CODE_SMELL", "MINOR", true),
+                        new RuleDefinition("S002", "Modules should not have too many lines",
+                                        "Split large modules into smaller, focused modules",
+                                        "CODE_SMELL", "MINOR", false),
+                        new RuleDefinition("S003", "Pipe chains should start with a raw value",
+                                        "Use a variable or literal as the first element of a pipe chain",
+                                        "CODE_SMELL", "MINOR", false),
+                        new RuleDefinition("S004", "IO.inspect calls should be removed",
+                                        "Remove debugging IO.inspect calls before committing",
+                                        "CODE_SMELL", "MAJOR", true),
 
-                        // Security
-                        new RuleDefinition("S101", "HardcodedSecret",
-                                        "Credentials should not be hardcoded",
-                                        "VULNERABILITY", "BLOCKER"),
-                        new RuleDefinition("S102", "SQLInjection",
-                                        "SQL queries should not be built using string interpolation",
-                                        "VULNERABILITY", "CRITICAL"),
-                        new RuleDefinition("S103", "AtomFromUserInput",
-                                        "String.to_atom should not be called on user input",
-                                        "VULNERABILITY", "CRITICAL"),
-                        new RuleDefinition("S104", "UnsafeDeserialization",
-                                        ":erlang.binary_to_term should not be used with untrusted input",
-                                        "VULNERABILITY", "CRITICAL"),
-                        new RuleDefinition("S105", "InsecureHttpClient",
-                                        "HTTP requests should use HTTPS",
-                                        "VULNERABILITY", "MAJOR"),
-                        new RuleDefinition("S106", "WeakCrypto",
-                                        "Weak cryptographic algorithms should not be used",
-                                        "VULNERABILITY", "CRITICAL"),
-
-                        // Reliability
-                        new RuleDefinition("S201", "UnhandledErrorTuple",
-                                        "Error tuples should be pattern matched, not ignored",
-                                        "BUG", "MAJOR"),
-                        new RuleDefinition("S202", "BareRescue",
-                                        "rescue clauses should specify exception types",
-                                        "BUG", "MAJOR"),
-                        new RuleDefinition("S203", "GenServerCallInCallback",
-                                        "GenServer.call should not be used inside handle_call",
-                                        "BUG", "CRITICAL"));
+                        new RuleDefinition("S201", "Credentials should not be hardcoded",
+                                        "Use environment variables or runtime configuration for secrets",
+                                        "VULNERABILITY", "BLOCKER", true));
 
         @Override
         public void define(Context context) {
@@ -93,6 +50,13 @@ public class ElixirRulesDefinition implements RulesDefinition {
                 return RULES.stream().map(RuleDefinition::key).toList();
         }
 
+        public static List<String> defaultProfileKeys() {
+                return RULES.stream()
+                                .filter(RuleDefinition::defaultProfile)
+                                .map(RuleDefinition::key)
+                                .toList();
+        }
+
         private String loadRuleDescription(String ruleKey) {
                 // Descriptions loaded from
                 // src/main/resources/org/sonar/l10n/elixir/rules/<key>.html
@@ -109,6 +73,7 @@ public class ElixirRulesDefinition implements RulesDefinition {
         }
 
         private record RuleDefinition(
-                        String key, String name, String description, String type, String severity) {
+                        String key, String name, String description, String type, String severity,
+                        boolean defaultProfile) {
         }
 }

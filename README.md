@@ -115,40 +115,22 @@ The `tools/coverage.exs` script is included in the plugin JAR and also available
 
 ## Rules
 
-The default quality profile enables all rules. Rules without a checkmark are defined and will be implemented in future releases.
-
 ### Code Smells
 
-| Key  | Name               | Description                                             | Severity | Impl |
-| ---- | ------------------ | ------------------------------------------------------- | -------- | :--: |
-| S001 | FunctionComplexity | Function cognitive complexity should not be too high    | Major    |      |
-| S002 | LongFunction       | Functions should not have too many lines                | Major    |      |
-| S003 | TooManyParameters  | Functions should not have too many parameters           | Major    |      |
-| S004 | NestingDepth       | Control flow statements should not be nested too deeply | Major    |      |
-| S005 | MissingModuledoc   | Modules should have `@moduledoc`                        | Minor    |  ✓   |
-| S006 | LargeModule        | Modules should not have too many lines                  | Major    |      |
-| S007 | PipeChainStart     | Pipe chains should start with a raw value               | Minor    |  ✓   |
-| S008 | SingleClauseWith   | `with` statements should have more than one clause      | Minor    |      |
-| S009 | IoInspect          | `IO.inspect` calls should be removed                    | Major    |  ✓   |
+| Key  | Name             | Description                               | Severity | Default |
+| ---- | ---------------- | ----------------------------------------- | -------- | :-----: |
+| S001 | MissingModuledoc | Modules should have `@moduledoc`          | Minor    |    ✓    |
+| S002 | LargeModule      | Modules should not have too many lines    | Minor    |         |
+| S003 | PipeChainStart   | Pipe chains should start with a raw value | Minor    |         |
+| S004 | IoInspect        | `IO.inspect` calls should be removed      | Major    |    ✓    |
 
 ### Vulnerabilities
 
-| Key  | Name                  | Description                                                      | Severity | Impl |
-| ---- | --------------------- | ---------------------------------------------------------------- | -------- | :--: |
-| S101 | HardcodedSecret       | Credentials should not be hardcoded                              | Blocker  |      |
-| S102 | SQLInjection          | SQL queries should not be built using string interpolation       | Critical |      |
-| S103 | AtomFromUserInput     | `String.to_atom` should not be called on user input              | Critical |      |
-| S104 | UnsafeDeserialization | `:erlang.binary_to_term` should not be used with untrusted input | Critical |      |
-| S105 | InsecureHttpClient    | HTTP requests should use HTTPS                                   | Major    |      |
-| S106 | WeakCrypto            | Weak cryptographic algorithms should not be used                 | Critical |      |
+| Key  | Name            | Description                         | Severity | Default |
+| ---- | --------------- | ----------------------------------- | -------- | :-----: |
+| S201 | HardcodedSecret | Credentials should not be hardcoded | Blocker  |    ✓    |
 
-### Bugs
-
-| Key  | Name                    | Description                                              | Severity | Impl |
-| ---- | ----------------------- | -------------------------------------------------------- | -------- | :--: |
-| S201 | UnhandledErrorTuple     | Error tuples should be pattern matched, not ignored      | Major    |      |
-| S202 | BareRescue              | `rescue` clauses should specify exception types          | Major    |      |
-| S203 | GenServerCallInCallback | `GenServer.call` should not be used inside `handle_call` | Critical |      |
+Rules marked with ✓ in **Default** are active in the built-in "Elixir Way" quality profile. All rules can be individually enabled or disabled in SonarQube's quality profile settings.
 
 ## Contributing
 

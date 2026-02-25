@@ -10,15 +10,26 @@ import org.sonar.api.batch.sensor.issue.NewIssueLocation;
 import org.sonar.api.rule.RuleKey;
 
 /**
- * S005: Modules should have a @moduledoc attribute.
+ * S006: Modules should not have too many lines.
  *
- * Walks the AST looking for defmodule nodes and checks whether the module body
- * contains a @moduledoc. Modules that set @moduledoc false are considered
- * compliant (intentional suppression).
+ * Finds defmodule nodes in the AST, computes line span from the defmodule
+ * declaration to the deepest descendant, and reports when it exceeds the
+ * threshold.
  */
-public class MissingModuledocRule implements ElixirRule {
+public class LargeModuleRule implements ElixirRule {
 
-    private static final String KEY = "S001";
+    private static final String KEY = "S002";
+    static final int DEFAULT_MAX_LINES = 500;
+
+    private final int maxLines;
+
+    public LargeModuleRule() {
+        this(DEFAULT_MAX_LINES);
+    }
+
+    public LargeModuleRule(int maxLines) {
+        this.maxLines = maxLines;
+    }
 
     @Override
     public String ruleKey() {
@@ -32,7 +43,8 @@ public class MissingModuledocRule implements ElixirRule {
             NewIssue issue = context.newIssue().forRule(ruleKey);
             NewIssueLocation location = issue.newLocation()
                     .on(file)
-                    .message("Add @moduledoc to " + finding.moduleName());
+                    .message(finding.moduleName() + " has " + finding.lineCount()
+                            + " lines (max " + maxLines + ")");
 
             if (finding.line() > 0) {
                 location.at(file.selectLine(finding.line()));
@@ -42,50 +54,29 @@ public class MissingModuledocRule implements ElixirRule {
         }
     }
 
-    /** Detect modules missing @moduledoc, returning findings with location info. */
     List<Finding> detect(ElixirAst ast) {
         List<Finding> findings = new ArrayList<>();
         for (ElixirAst defmodule : ast.findAll("defmodule")) {
-            String moduleName = extractModuleName(defmodule);
-            if (moduleName.endsWith("Test")) {
+            int startLine = defmodule.line();
+            int endLine = maxLine(defmodule);
+            if (startLine <= 0 || endLine <= 0) {
                 continue;
             }
-            if (!hasModuledoc(defmodule)) {
-                findings.add(new Finding(moduleName, defmodule.line()));
+            int lineCount = endLine - startLine + 2;
+            if (lineCount > maxLines) {
+                String name = extractModuleName(defmodule);
+                findings.add(new Finding(name, startLine, lineCount));
             }
         }
         return findings;
     }
 
-    private boolean hasModuledoc(ElixirAst defmodule) {
-        ElixirAst body = getModuleBody(defmodule);
-        if (body == null) {
-            return false;
+    private int maxLine(ElixirAst node) {
+        int max = node.line();
+        for (ElixirAst child : node.children()) {
+            max = Math.max(max, maxLine(child));
         }
-
-        for (ElixirAst expr : body.blockChildren()) {
-            if ("@".equals(expr.type())) {
-                for (ElixirAst attr : expr.children()) {
-                    if ("moduledoc".equals(attr.type())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Navigate defmodule -> children[1] (keyword list) -> "do" keyword -> body.
-     */
-    private ElixirAst getModuleBody(ElixirAst defmodule) {
-        List<ElixirAst> children = defmodule.children();
-        if (children.size() < 2) {
-            return null;
-        }
-
-        ElixirAst kwList = children.get(1);
-        return kwList.keyword("do").orElse(null);
+        return max;
     }
 
     private String extractModuleName(ElixirAst defmodule) {
@@ -107,6 +98,6 @@ public class MissingModuledocRule implements ElixirRule {
         return "Module";
     }
 
-    record Finding(String moduleName, int line) {
+    record Finding(String moduleName, int line, int lineCount) {
     }
 }

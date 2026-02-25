@@ -11,7 +11,7 @@ class MissingModuledocRuleTest {
 
     @Test
     void ruleKey() {
-        assertThat(rule.ruleKey()).isEqualTo("S005");
+        assertThat(rule.ruleKey()).isEqualTo("S001");
     }
 
     @Test

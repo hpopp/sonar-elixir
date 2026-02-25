@@ -17,7 +17,7 @@ import org.sonar.api.rule.RuleKey;
  */
 public class IoInspectRule implements ElixirRule {
 
-    private static final String KEY = "S009";
+    private static final String KEY = "S004";
 
     @Override
     public String ruleKey() {

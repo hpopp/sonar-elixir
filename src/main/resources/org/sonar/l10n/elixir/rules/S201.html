@@ -1,0 +1,45 @@
+<p>Hardcoding credentials in source code is a security risk. If the code is shared, stored in version control, or deployed to an environment where it can be read, the credentials are compromised.</p>
+
+<h2>Detection Strategies</h2>
+<p>This rule uses two detection strategies:</p>
+<ol>
+  <li><strong>Key-name matching</strong> — flags sensitive keys (<code>password</code>, <code>secret_key_base</code>, <code>api_key</code>, <code>token</code>, etc.) assigned to hardcoded string values in config keyword lists and module attributes.</li>
+  <li><strong>Prefix matching</strong> — flags any string literal whose value starts with a known credential prefix, regardless of context. Supported prefixes include Stripe (<code>sk_live_</code>, <code>sk_test_</code>), AWS (<code>AKIA</code>, <code>ASIA</code>), GitHub (<code>ghp_</code>, <code>github_pat_</code>), GitLab (<code>glpat-</code>, <code>gldt-</code>, <code>glrt-</code>), Slack (<code>xoxb-</code>, <code>xoxp-</code>), and SendGrid (<code>SG.</code>).</li>
+</ol>
+
+<h2>Noncompliant Code Examples</h2>
+<pre>
+# Sensitive key with hardcoded value
+config :my_app, secret_key_base: "hardcoded_secret_value"
+
+config :my_app, MyApp.Repo,
+  password: "hunter2"
+
+# Known credential prefix
+defmodule MyApp.Stripe do
+  @api_key "sk_live_abc123def456"
+end
+
+# AWS access key
+@aws_key "AKIAIOSFODNN7EXAMPLE"
+</pre>
+
+<h2>Compliant Solutions</h2>
+<pre>
+# Environment variables
+config :my_app, secret_key_base: System.get_env("SECRET_KEY_BASE")
+
+config :my_app, MyApp.Repo,
+  password: System.get_env("DATABASE_PASSWORD")
+
+# Runtime configuration (runtime.exs)
+config :my_app, MyApp.Repo,
+  password: System.fetch_env!("DATABASE_PASSWORD")
+</pre>
+
+<h2>See Also</h2>
+<ul>
+  <li><a href="https://hexdocs.pm/phoenix/deployment.html">Phoenix Deployment Guide</a> — runtime configuration best practices</li>
+  <li><a href="https://github.com/nccgroup/sobelow">Sobelow</a> — Config.Secrets check</li>
+  <li><a href="https://owasp.org/Top10/A07_2021-Identification_and_Authentication_Failures/">OWASP Top 10 — A07:2021</a></li>
+</ul>

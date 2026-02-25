@@ -11,7 +11,7 @@ class PipeChainStartRuleTest {
 
     @Test
     void ruleKey() {
-        assertThat(rule.ruleKey()).isEqualTo("S007");
+        assertThat(rule.ruleKey()).isEqualTo("S003");
     }
 
     @Test
