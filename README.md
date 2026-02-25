@@ -1,6 +1,6 @@
 [![CI](https://github.com/hpopp/sonar-elixir/actions/workflows/ci.yml/badge.svg)](https://github.com/hpopp/sonar-elixir/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-0.1.0-orange.svg)](https://github.com/hpopp/sonar-elixir/commits/main)
-[![License](https://img.shields.io/hexpm/l/sonar-elixir.svg)](https://github.com/hpopp/sonar-elixir/blob/main/LICENSE)
+[![License](https://img.shields.io/github/license/hpopp/sonar-elixir)](LICENSE)
 [![Last Updated](https://img.shields.io/github/last-commit/hpopp/sonar-elixir.svg)](https://github.com/hpopp/sonar-elixir/commits/main)
 
 # sonar-elixir
