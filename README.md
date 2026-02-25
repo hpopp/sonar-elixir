@@ -7,6 +7,9 @@
 
 SonarQube plugin for static analysis of Elixir projects.
 
+> [!NOTE]
+> This plugin is in early development. Only a subset of rules are currently implemented. Feedback, bug reports, and contributions are welcome.
+
 ## Features
 
 - **Static analysis** -- Credo-inspired rules covering code smells, security vulnerabilities, and reliability bugs
