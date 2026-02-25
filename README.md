@@ -127,8 +127,9 @@ The default quality profile enables all rules. Rules without a checkmark are def
 | S004 | NestingDepth       | Control flow statements should not be nested too deeply | Major    |      |
 | S005 | MissingModuledoc   | Modules should have `@moduledoc`                        | Minor    |  ✓   |
 | S006 | LargeModule        | Modules should not have too many lines                  | Major    |      |
-| S007 | PipeChainStart     | Pipe chains should start with a raw value               | Minor    |      |
+| S007 | PipeChainStart     | Pipe chains should start with a raw value               | Minor    |  ✓   |
 | S008 | SingleClauseWith   | `with` statements should have more than one clause      | Minor    |      |
+| S009 | IoInspect          | `IO.inspect` calls should be removed                    | Major    |  ✓   |
 
 ### Vulnerabilities
 

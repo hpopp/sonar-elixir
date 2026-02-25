@@ -1,0 +1,21 @@
+<p>Pipe chains should begin with a raw value — a variable, literal, or data structure — rather than a function call.
+Starting with a plain value makes the data flow through the pipeline easier to read.</p>
+
+<h2>Noncompliant Code Example</h2>
+<pre>
+String.trim(name) |> String.upcase()
+
+Enum.map(list, &amp;to_string/1) |> Enum.join(", ")
+</pre>
+
+<h2>Compliant Solutions</h2>
+<pre>
+name |> String.trim() |> String.upcase()
+
+list |> Enum.map(&amp;to_string/1) |> Enum.join(", ")
+</pre>
+
+<h2>See</h2>
+<ul>
+  <li>Credo: <code>Credo.Check.Readability.PipeChainStart</code></li>
+</ul>

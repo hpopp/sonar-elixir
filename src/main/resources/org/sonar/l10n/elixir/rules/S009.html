@@ -1,0 +1,26 @@
+<p><code>IO.inspect/1</code> is a debugging tool that writes values to standard output.
+These calls should be removed before committing to keep logs clean and avoid leaking internal data.</p>
+
+<h2>Noncompliant Code Example</h2>
+<pre>
+def process(data) do
+  data
+  |> transform()
+  |> IO.inspect()
+  |> save()
+end
+</pre>
+
+<h2>Compliant Solution</h2>
+<pre>
+def process(data) do
+  data
+  |> transform()
+  |> save()
+end
+</pre>
+
+<h2>See</h2>
+<ul>
+  <li>Credo: <code>Credo.Check.Warning.IoInspect</code></li>
+</ul>

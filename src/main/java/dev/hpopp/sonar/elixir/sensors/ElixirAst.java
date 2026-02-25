@@ -56,6 +56,12 @@ public record ElixirAst(
                     int line = extractLine(tuple.get(1));
                     int column = extractColumn(tuple.get(1));
                     List<ElixirAst> children = extractChildren(tuple.get(2));
+                    if ("nested_call".equals(type)) {
+                        var all = new ArrayList<ElixirAst>();
+                        all.add(fromJson(tuple.get(0)));
+                        all.addAll(children);
+                        children = all;
+                    }
                     return new ElixirAst(type, line, column, children, null);
                 }
             }

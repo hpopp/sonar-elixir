@@ -18,6 +18,8 @@ public interface ElixirRule {
 
     static List<ElixirRule> allRules() {
         return List.of(
-                new MissingModuledocRule());
+                new MissingModuledocRule(),
+                new PipeChainStartRule(),
+                new IoInspectRule());
     }
 }
