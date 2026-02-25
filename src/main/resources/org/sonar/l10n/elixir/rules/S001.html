@@ -1,0 +1,38 @@
+<p>Functions with high cognitive complexity are hard to understand, test, and maintain.</p>
+<h2>Noncompliant Code Example</h2>
+<pre>
+def process(data) do                    # +0
+  if valid?(data) do                    # +1
+    case classify(data) do              # +2 (nesting)
+      :type_a ->
+        if special?(data) do            # +3 (nesting)
+          handle_special(data)
+        else                            # +1
+          handle_normal(data)
+        end
+      :type_b ->
+        Enum.each(data.items, fn item -> # +3 (nesting)
+          if item.active? do            # +4 (nesting)
+            activate(item)
+          end
+        end)
+    end
+  end
+end
+</pre>
+<h2>Compliant Solution</h2>
+<pre>
+def process(data) do
+  with :ok &lt;- validate(data),
+       result &lt;- classify_and_handle(data) do
+    result
+  end
+end
+
+defp classify_and_handle(data) do
+  case classify(data) do
+    :type_a -> handle_type_a(data)
+    :type_b -> handle_type_b(data)
+  end
+end
+</pre>

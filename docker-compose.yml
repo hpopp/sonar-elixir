@@ -1,0 +1,15 @@
+services:
+  sonarqube:
+    image: sonarqube:community
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_logs:/opt/sonarqube/logs
+      - ./target/sonar-elixir-plugin-0.1.0.jar:/opt/sonarqube/extensions/plugins/sonar-elixir-plugin-0.1.0.jar:ro
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+
+volumes:
+  sonar_data:
+  sonar_logs:
