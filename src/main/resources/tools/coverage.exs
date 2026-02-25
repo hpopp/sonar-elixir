@@ -65,12 +65,15 @@ defmodule SonarCoverage do
         source_file = find_source_file(module)
 
         if source_file do
+          source_lines = read_source_lines(source_file)
+
           lines =
             line_data
             |> Enum.map(fn {{_mod, line}, {hits, _misses}} ->
               {line, hits}
             end)
             |> Enum.reject(fn {line, _} -> line == 0 end)
+            |> Enum.reject(fn {line, _} -> non_executable_line?(source_lines, line) end)
             |> Enum.sort_by(&elem(&1, 0))
 
           {source_file, lines}
@@ -92,6 +95,20 @@ defmodule SonarCoverage do
     end
   rescue
     _ -> nil
+  end
+
+  defp read_source_lines(path) do
+    case File.read(path) do
+      {:ok, contents} -> String.split(contents, "\n")
+      _ -> []
+    end
+  end
+
+  defp non_executable_line?(source_lines, line_num) do
+    case Enum.at(source_lines, line_num - 1) do
+      nil -> false
+      line -> String.trim(line) == "end"
+    end
   end
 
   defp make_relative(path) do

@@ -9,3 +9,4 @@ target/
 .project
 .DS_Store
 .scannerwork/
+erl_crash.dump

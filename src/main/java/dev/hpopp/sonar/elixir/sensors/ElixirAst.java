@@ -32,6 +32,10 @@ public record ElixirAst(
         return fromJson(root);
     }
 
+    public static ElixirAst parse(JsonElement element) {
+        return fromJson(element);
+    }
+
     private static ElixirAst fromJson(JsonElement element) {
         if (element == null || element.isJsonNull()) {
             return new ElixirAst("nil", 0, 0, List.of(), null);

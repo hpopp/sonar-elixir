@@ -1,5 +1,9 @@
 package dev.hpopp.sonar.elixir.sensors;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -7,14 +11,17 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Parses Elixir source files by shelling out to the escript in tools/parse.exs.
+ * Parses Elixir source files by shelling out to tools/parse.exs.
  *
- * The escript calls Code.string_to_quoted!/2 and emits the AST as JSON.
+ * Returns a ParseResult containing the AST (for rules) and syntax tokens
+ * (for highlighting).
  */
 public class ElixirParser {
 
@@ -32,7 +39,7 @@ public class ElixirParser {
         this("elixir");
     }
 
-    public ElixirAst parse(Path file) {
+    public ParseResult parse(Path file) {
         try {
             Path scriptPath = locateScript();
             ProcessBuilder pb = new ProcessBuilder(
@@ -45,7 +52,8 @@ public class ElixirParser {
 
             try (
                     var reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    var errReader = new BufferedReader(new InputStreamReader(process.getErrorStream()))) {
+                    var errReader = new BufferedReader(
+                            new InputStreamReader(process.getErrorStream()))) {
                 stdout = reader.lines().reduce("", (a, b) -> a + b);
                 stderr = errReader.lines().reduce("", (a, b) -> a + "\n" + b).trim();
             }
@@ -62,12 +70,39 @@ public class ElixirParser {
                 return null;
             }
 
-            return ElixirAst.parse(stdout);
+            return parseJson(stdout);
 
         } catch (IOException | InterruptedException e) {
             LOG.error("Failed to run Elixir parser for {}: {}", file, e.getMessage());
             return null;
         }
+    }
+
+    private ParseResult parseJson(String json) {
+        JsonObject root = JsonParser.parseString(json).getAsJsonObject();
+
+        ElixirAst ast = ElixirAst.parse(root.get("ast"));
+        List<ParseResult.SyntaxToken> tokens = parseTokens(root.getAsJsonArray("tokens"));
+
+        return new ParseResult(ast, tokens);
+    }
+
+    private List<ParseResult.SyntaxToken> parseTokens(JsonArray arr) {
+        List<ParseResult.SyntaxToken> tokens = new ArrayList<>();
+        if (arr == null) {
+            return tokens;
+        }
+
+        for (JsonElement elem : arr) {
+            JsonObject obj = elem.getAsJsonObject();
+            tokens.add(new ParseResult.SyntaxToken(
+                obj.get("type").getAsString(),
+                obj.get("line").getAsInt(),
+                obj.get("col").getAsInt(),
+                obj.get("end_line").getAsInt(),
+                obj.get("end_col").getAsInt()));
+        }
+        return tokens;
     }
 
     private Path locateScript() throws IOException {

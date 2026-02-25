@@ -30,7 +30,9 @@ defmodule SonarCoverage do
 
     for file <- coverdata_files do
       case :cover.import(String.to_charlist(file)) do
-        :ok -> :ok
+        :ok ->
+          :ok
+
         {:error, reason} ->
           IO.puts(:stderr, "Warning: failed to import #{file}: #{inspect(reason)}")
       end
@@ -48,9 +50,11 @@ defmodule SonarCoverage do
     File.write!(output_path, xml)
 
     total_lines = Enum.reduce(file_coverages, 0, fn {_, lines}, acc -> acc + length(lines) end)
-    covered = Enum.reduce(file_coverages, 0, fn {_, lines}, acc ->
-      acc + Enum.count(lines, fn {_, count} -> count > 0 end)
-    end)
+
+    covered =
+      Enum.reduce(file_coverages, 0, fn {_, lines}, acc ->
+        acc + Enum.count(lines, fn {_, count} -> count > 0 end)
+      end)
 
     pct = if total_lines > 0, do: Float.round(covered / total_lines * 100, 1), else: 0.0
     IO.puts("Coverage: #{covered}/#{total_lines} lines (#{pct}%)")
@@ -65,12 +69,15 @@ defmodule SonarCoverage do
         source_file = find_source_file(module)
 
         if source_file do
+          source_lines = read_source_lines(source_file)
+
           lines =
             line_data
             |> Enum.map(fn {{_mod, line}, {hits, _misses}} ->
               {line, hits}
             end)
             |> Enum.reject(fn {line, _} -> line == 0 end)
+            |> Enum.reject(fn {line, _} -> non_executable_line?(source_lines, line) end)
             |> Enum.sort_by(&elem(&1, 0))
 
           {source_file, lines}
@@ -85,13 +92,29 @@ defmodule SonarCoverage do
 
   defp find_source_file(module) do
     case module.module_info(:compile)[:source] do
-      nil -> nil
+      nil ->
+        nil
+
       source ->
         path = List.to_string(source)
         make_relative(path)
     end
   rescue
     _ -> nil
+  end
+
+  defp read_source_lines(path) do
+    case File.read(path) do
+      {:ok, contents} -> String.split(contents, "\n")
+      _ -> []
+    end
+  end
+
+  defp non_executable_line?(source_lines, line_num) do
+    case Enum.at(source_lines, line_num - 1) do
+      nil -> false
+      line -> String.trim(line) == "end"
+    end
   end
 
   defp make_relative(path) do
