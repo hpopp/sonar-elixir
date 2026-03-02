@@ -2,8 +2,8 @@ package dev.hpopp.sonar.elixir.rules;
 
 import dev.hpopp.sonar.elixir.sensors.ElixirAst;
 import java.util.List;
-import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.sensor.SensorContext;
 
 /**
  * Base interface for all Elixir analysis rules.
@@ -11,17 +11,17 @@ import org.sonar.api.batch.fs.InputFile;
  * Each rule receives the parsed AST and reports issues via the sensor context.
  */
 public interface ElixirRule {
+  String ruleKey();
 
-    String ruleKey();
+  void analyze(SensorContext context, InputFile file, ElixirAst ast);
 
-    void analyze(SensorContext context, InputFile file, ElixirAst ast);
-
-    static List<ElixirRule> allRules() {
-        return List.of(
-                new MissingModuledocRule(),
-                new LargeModuleRule(),
-                new PipeChainStartRule(),
-                new IoInspectRule(),
-                new HardcodedSecretRule());
-    }
+  static List<ElixirRule> allRules() {
+    return List.of(
+      new MissingModuledocRule(),
+      new LargeModuleRule(),
+      new PipeChainStartRule(),
+      new IoInspectRule(),
+      new HardcodedSecretRule()
+    );
+  }
 }

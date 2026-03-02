@@ -5,16 +5,18 @@ import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
 
 public class ElixirQualityProfile implements BuiltInQualityProfilesDefinition {
 
-    @Override
-    public void define(Context context) {
-        NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(
-                "Elixir Way", Elixir.KEY);
-        profile.setDefault(true);
+  @Override
+  public void define(Context context) {
+    NewBuiltInQualityProfile profile = context.createBuiltInQualityProfile(
+      "Elixir Way",
+      Elixir.KEY
+    );
+    profile.setDefault(true);
 
-        for (String ruleKey : ElixirRulesDefinition.defaultProfileKeys()) {
-            profile.activateRule(ElixirRulesDefinition.REPOSITORY_KEY, ruleKey);
-        }
-
-        profile.done();
+    for (String ruleKey : ElixirRulesDefinition.defaultProfileKeys()) {
+      profile.activateRule(ElixirRulesDefinition.REPOSITORY_KEY, ruleKey);
     }
+
+    profile.done();
+  }
 }

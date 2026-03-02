@@ -30,7 +30,9 @@ defmodule SonarCoverage do
 
     for file <- coverdata_files do
       case :cover.import(String.to_charlist(file)) do
-        :ok -> :ok
+        :ok ->
+          :ok
+
         {:error, reason} ->
           IO.puts(:stderr, "Warning: failed to import #{file}: #{inspect(reason)}")
       end
@@ -48,9 +50,11 @@ defmodule SonarCoverage do
     File.write!(output_path, xml)
 
     total_lines = Enum.reduce(file_coverages, 0, fn {_, lines}, acc -> acc + length(lines) end)
-    covered = Enum.reduce(file_coverages, 0, fn {_, lines}, acc ->
-      acc + Enum.count(lines, fn {_, count} -> count > 0 end)
-    end)
+
+    covered =
+      Enum.reduce(file_coverages, 0, fn {_, lines}, acc ->
+        acc + Enum.count(lines, fn {_, count} -> count > 0 end)
+      end)
 
     pct = if total_lines > 0, do: Float.round(covered / total_lines * 100, 1), else: 0.0
     IO.puts("Coverage: #{covered}/#{total_lines} lines (#{pct}%)")
@@ -88,7 +92,9 @@ defmodule SonarCoverage do
 
   defp find_source_file(module) do
     case module.module_info(:compile)[:source] do
-      nil -> nil
+      nil ->
+        nil
+
       source ->
         path = List.to_string(source)
         make_relative(path)

@@ -7,8 +7,13 @@ import java.util.List;
  * highlighting.
  */
 public record ParseResult(ElixirAst ast, List<SyntaxToken> tokens) {
-
-    public record SyntaxToken(String type, int line, int col, int endLine, int endCol) {
-        // Empty
-    }
+  public record SyntaxToken(
+    String type,
+    int line,
+    int col,
+    int endLine,
+    int endCol
+  ) {
+    // Empty
+  }
 }

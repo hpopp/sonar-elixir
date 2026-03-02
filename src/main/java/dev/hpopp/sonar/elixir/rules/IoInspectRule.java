@@ -17,61 +17,64 @@ import org.sonar.api.rule.RuleKey;
  */
 public class IoInspectRule implements ElixirRule {
 
-    private static final String KEY = "S004";
+  private static final String KEY = "S004";
 
-    @Override
-    public String ruleKey() {
-        return KEY;
+  @Override
+  public String ruleKey() {
+    return KEY;
+  }
+
+  @Override
+  public void analyze(SensorContext context, InputFile file, ElixirAst ast) {
+    for (int line : detect(ast)) {
+      RuleKey ruleKey = RuleKey.of(ElixirRulesDefinition.REPOSITORY_KEY, KEY);
+      NewIssue issue = context.newIssue().forRule(ruleKey);
+      NewIssueLocation location = issue
+        .newLocation()
+        .on(file)
+        .message("Remove this IO.inspect call");
+
+      if (line > 0) {
+        location.at(file.selectLine(line));
+      }
+
+      issue.at(location).save();
     }
+  }
 
-    @Override
-    public void analyze(SensorContext context, InputFile file, ElixirAst ast) {
-        for (int line : detect(ast)) {
-            RuleKey ruleKey = RuleKey.of(ElixirRulesDefinition.REPOSITORY_KEY, KEY);
-            NewIssue issue = context.newIssue().forRule(ruleKey);
-            NewIssueLocation location = issue.newLocation()
-                    .on(file)
-                    .message("Remove this IO.inspect call");
+  List<Integer> detect(ElixirAst ast) {
+    List<Integer> lines = new ArrayList<>();
+    ast.walk(node -> {
+      if (!"nested_call".equals(node.type())) {
+        return;
+      }
+      List<ElixirAst> children = node.children();
+      if (children.isEmpty()) {
+        return;
+      }
+      ElixirAst dot = children.get(0);
+      if (!".".equals(dot.type())) {
+        return;
+      }
+      List<ElixirAst> dotChildren = dot.children();
+      if (dotChildren.size() < 2) {
+        return;
+      }
+      if (
+        isIoAlias(dotChildren.get(0)) &&
+        "inspect".equals(dotChildren.get(1).value())
+      ) {
+        lines.add(node.line());
+      }
+    });
+    return lines;
+  }
 
-            if (line > 0) {
-                location.at(file.selectLine(line));
-            }
-
-            issue.at(location).save();
-        }
+  private boolean isIoAlias(ElixirAst node) {
+    if (!"__aliases__".equals(node.type())) {
+      return false;
     }
-
-    List<Integer> detect(ElixirAst ast) {
-        List<Integer> lines = new ArrayList<>();
-        ast.walk(node -> {
-            if (!"nested_call".equals(node.type())) {
-                return;
-            }
-            List<ElixirAst> children = node.children();
-            if (children.isEmpty()) {
-                return;
-            }
-            ElixirAst dot = children.get(0);
-            if (!".".equals(dot.type())) {
-                return;
-            }
-            List<ElixirAst> dotChildren = dot.children();
-            if (dotChildren.size() < 2) {
-                return;
-            }
-            if (isIoAlias(dotChildren.get(0)) && "inspect".equals(dotChildren.get(1).value())) {
-                lines.add(node.line());
-            }
-        });
-        return lines;
-    }
-
-    private boolean isIoAlias(ElixirAst node) {
-        if (!"__aliases__".equals(node.type())) {
-            return false;
-        }
-        List<ElixirAst> parts = node.children();
-        return parts.size() == 1
-                && "IO".equals(parts.get(0).value());
-    }
+    List<ElixirAst> parts = node.children();
+    return parts.size() == 1 && "IO".equals(parts.get(0).value());
+  }
 }

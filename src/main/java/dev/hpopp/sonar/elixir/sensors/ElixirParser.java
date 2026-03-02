@@ -25,101 +25,117 @@ import org.slf4j.LoggerFactory;
  */
 public class ElixirParser {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ElixirParser.class);
-    private static final int TIMEOUT_SECONDS = 30;
+  private static final Logger LOG = LoggerFactory.getLogger(ElixirParser.class);
+  private static final int TIMEOUT_SECONDS = 30;
 
-    private final String elixirPath;
-    private Path cachedScript;
+  private final String elixirPath;
+  private Path cachedScript;
 
-    public ElixirParser(String elixirPath) {
-        this.elixirPath = elixirPath;
+  public ElixirParser(String elixirPath) {
+    this.elixirPath = elixirPath;
+  }
+
+  public ElixirParser() {
+    this("elixir");
+  }
+
+  public ParseResult parse(Path file) {
+    try {
+      Path scriptPath = locateScript();
+      ProcessBuilder pb = new ProcessBuilder(
+        elixirPath,
+        scriptPath.toString(),
+        file.toAbsolutePath().toString()
+      );
+      pb.redirectErrorStream(false);
+
+      Process process = pb.start();
+      String stdout;
+      String stderr;
+
+      try (
+        var reader = new BufferedReader(
+          new InputStreamReader(process.getInputStream())
+        );
+        var errReader = new BufferedReader(
+          new InputStreamReader(process.getErrorStream())
+        )
+      ) {
+        stdout = reader.lines().reduce("", (a, b) -> a + b);
+        stderr = errReader
+          .lines()
+          .reduce("", (a, b) -> a + "\n" + b)
+          .trim();
+      }
+
+      boolean finished = process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS);
+      if (!finished) {
+        process.destroyForcibly();
+        LOG.error("Elixir parser timed out for file: {}", file);
+        return null;
+      }
+
+      if (process.exitValue() != 0) {
+        LOG.error("Elixir parser failed for {}: {}", file, stderr);
+        return null;
+      }
+
+      return parseJson(stdout);
+    } catch (IOException | InterruptedException e) {
+      LOG.error("Failed to run Elixir parser for {}: {}", file, e.getMessage());
+      return null;
+    }
+  }
+
+  private ParseResult parseJson(String json) {
+    JsonObject root = JsonParser.parseString(json).getAsJsonObject();
+
+    ElixirAst ast = ElixirAst.parse(root.get("ast"));
+    List<ParseResult.SyntaxToken> tokens = parseTokens(
+      root.getAsJsonArray("tokens")
+    );
+
+    return new ParseResult(ast, tokens);
+  }
+
+  private List<ParseResult.SyntaxToken> parseTokens(JsonArray arr) {
+    List<ParseResult.SyntaxToken> tokens = new ArrayList<>();
+    if (arr == null) {
+      return tokens;
     }
 
-    public ElixirParser() {
-        this("elixir");
+    for (JsonElement elem : arr) {
+      JsonObject obj = elem.getAsJsonObject();
+      tokens.add(
+        new ParseResult.SyntaxToken(
+          obj.get("type").getAsString(),
+          obj.get("line").getAsInt(),
+          obj.get("col").getAsInt(),
+          obj.get("end_line").getAsInt(),
+          obj.get("end_col").getAsInt()
+        )
+      );
+    }
+    return tokens;
+  }
+
+  private Path locateScript() throws IOException {
+    if (cachedScript != null && Files.exists(cachedScript)) {
+      return cachedScript;
     }
 
-    public ParseResult parse(Path file) {
-        try {
-            Path scriptPath = locateScript();
-            ProcessBuilder pb = new ProcessBuilder(
-                    elixirPath, scriptPath.toString(), file.toAbsolutePath().toString());
-            pb.redirectErrorStream(false);
-
-            Process process = pb.start();
-            String stdout;
-            String stderr;
-
-            try (
-                    var reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-                    var errReader = new BufferedReader(
-                            new InputStreamReader(process.getErrorStream()))) {
-                stdout = reader.lines().reduce("", (a, b) -> a + b);
-                stderr = errReader.lines().reduce("", (a, b) -> a + "\n" + b).trim();
-            }
-
-            boolean finished = process.waitFor(TIMEOUT_SECONDS, TimeUnit.SECONDS);
-            if (!finished) {
-                process.destroyForcibly();
-                LOG.error("Elixir parser timed out for file: {}", file);
-                return null;
-            }
-
-            if (process.exitValue() != 0) {
-                LOG.error("Elixir parser failed for {}: {}", file, stderr);
-                return null;
-            }
-
-            return parseJson(stdout);
-
-        } catch (IOException | InterruptedException e) {
-            LOG.error("Failed to run Elixir parser for {}: {}", file, e.getMessage());
-            return null;
-        }
+    InputStream resource = getClass()
+      .getClassLoader()
+      .getResourceAsStream("tools/parse.exs");
+    if (resource != null) {
+      Path tmp = Files.createTempFile("sonar-elixir-parse", ".exs");
+      tmp.toFile().deleteOnExit();
+      Files.copy(resource, tmp, StandardCopyOption.REPLACE_EXISTING);
+      resource.close();
+      cachedScript = tmp;
+      return tmp;
     }
 
-    private ParseResult parseJson(String json) {
-        JsonObject root = JsonParser.parseString(json).getAsJsonObject();
-
-        ElixirAst ast = ElixirAst.parse(root.get("ast"));
-        List<ParseResult.SyntaxToken> tokens = parseTokens(root.getAsJsonArray("tokens"));
-
-        return new ParseResult(ast, tokens);
-    }
-
-    private List<ParseResult.SyntaxToken> parseTokens(JsonArray arr) {
-        List<ParseResult.SyntaxToken> tokens = new ArrayList<>();
-        if (arr == null) {
-            return tokens;
-        }
-
-        for (JsonElement elem : arr) {
-            JsonObject obj = elem.getAsJsonObject();
-            tokens.add(new ParseResult.SyntaxToken(
-                obj.get("type").getAsString(),
-                obj.get("line").getAsInt(),
-                obj.get("col").getAsInt(),
-                obj.get("end_line").getAsInt(),
-                obj.get("end_col").getAsInt()));
-        }
-        return tokens;
-    }
-
-    private Path locateScript() throws IOException {
-        if (cachedScript != null && Files.exists(cachedScript)) {
-            return cachedScript;
-        }
-
-        InputStream resource = getClass().getClassLoader().getResourceAsStream("tools/parse.exs");
-        if (resource != null) {
-            Path tmp = Files.createTempFile("sonar-elixir-parse", ".exs");
-            tmp.toFile().deleteOnExit();
-            Files.copy(resource, tmp, StandardCopyOption.REPLACE_EXISTING);
-            resource.close();
-            cachedScript = tmp;
-            return tmp;
-        }
-
-        return Path.of("tools", "parse.exs");
-    }
+    return Path.of("tools", "parse.exs");
+  }
 }
