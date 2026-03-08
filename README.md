@@ -3,7 +3,7 @@
 > SonarQube plugin for static analysis of Elixir projects.
 
 [![CI](https://github.com/hpopp/sonar-elixir/actions/workflows/ci.yml/badge.svg)](https://github.com/hpopp/sonar-elixir/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-0.1.0-orange.svg)](https://github.com/hpopp/sonar-elixir/commits/main)
+[![Version](https://img.shields.io/badge/version-0.1.1-orange.svg)](https://github.com/hpopp/sonar-elixir/commits/main)
 [![License](https://img.shields.io/github/license/hpopp/sonar-elixir)](LICENSE)
 [![Last Updated](https://img.shields.io/github/last-commit/hpopp/sonar-elixir.svg)](https://github.com/hpopp/sonar-elixir/commits/main)
 
@@ -20,7 +20,7 @@
 
 ## Installation
 
-**Compatibility:** SonarQube 9.9+ (Community Edition or higher).
+**Compatibility:** SonarQube 2025.1 LTA and later (Community Build and Server editions).
 
 1. Download the latest `sonar-elixir-plugin-x.y.z.jar` from [Releases](https://github.com/hpopp/sonar-elixir/releases).
 
@@ -124,7 +124,7 @@ Rules marked with ✓ in **Default** are active in the built-in "Elixir Way" qua
 mvn package
 ```
 
-The plugin JAR is written to `target/sonar-elixir-plugin-0.1.0.jar`.
+The plugin JAR is written to `target/sonar-elixir-plugin-x.y.z.jar`.
 
 ### Test
 
