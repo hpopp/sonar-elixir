@@ -18,7 +18,7 @@ import org.sonar.api.rule.RuleKey;
  */
 public class MissingModuledocRule implements ElixirRule {
 
-  private static final String KEY = "S001";
+  private static final String KEY = "missing_moduledoc";
 
   @Override
   public String ruleKey() {

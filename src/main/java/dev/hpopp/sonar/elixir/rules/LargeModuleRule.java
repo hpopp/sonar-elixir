@@ -18,7 +18,7 @@ import org.sonar.api.rule.RuleKey;
  */
 public class LargeModuleRule implements ElixirRule {
 
-  private static final String KEY = "S002";
+  private static final String KEY = "large_module";
   static final int DEFAULT_MAX_LINES = 500;
 
   private final int maxLines;

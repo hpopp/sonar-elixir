@@ -11,7 +11,7 @@ class IoInspectRuleTest {
 
     @Test
     void ruleKey() {
-        assertThat(rule.ruleKey()).isEqualTo("S004");
+        assertThat(rule.ruleKey()).isEqualTo("io_inspect");
     }
 
     @Test

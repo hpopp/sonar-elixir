@@ -19,7 +19,7 @@ import org.sonar.api.rule.RuleKey;
  */
 public class PipeChainStartRule implements ElixirRule {
 
-  private static final String KEY = "S003";
+  private static final String KEY = "pipe_chain_start";
 
   private static final Set<String> EXCLUDED_TYPES = Set.of(
     "@",

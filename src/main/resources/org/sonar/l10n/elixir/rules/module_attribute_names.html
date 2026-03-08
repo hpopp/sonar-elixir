@@ -1,0 +1,22 @@
+<p>
+  Module attribute names should always be written in
+  <code>snake_case</code> in Elixir. Consistent naming improves readability and
+  follows community conventions.
+</p>
+
+<h2>Noncompliant Code Example</h2>
+<pre>
+@inboxName "incoming"
+@maxRetries 3
+</pre>
+
+<h2>Compliant Solution</h2>
+<pre>
+@inbox_name "incoming"
+@max_retries 3
+</pre>
+
+<h2>See</h2>
+<ul>
+  <li>Credo: <code>Credo.Check.Readability.ModuleAttributeNames</code></li>
+</ul>

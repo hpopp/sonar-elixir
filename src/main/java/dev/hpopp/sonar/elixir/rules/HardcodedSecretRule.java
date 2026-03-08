@@ -22,7 +22,7 @@ import org.sonar.api.rule.RuleKey;
  */
 public class HardcodedSecretRule implements ElixirRule {
 
-  private static final String KEY = "S201";
+  private static final String KEY = "hardcoded_secret";
 
   static final Set<String> SENSITIVE_KEYS = Set.of(
     "password",

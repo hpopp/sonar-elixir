@@ -14,7 +14,7 @@ SonarQube plugin for static analysis of Elixir projects.
 
 - **Static analysis** -- Credo-inspired rules covering code smells, security vulnerabilities, and reliability bugs
 - **Metrics** -- Lines of code, comment lines, and executable line tracking
-- **Test coverage** -- Converts Elixir's `.coverdata` to SonarQube's generic coverage format
+- **Test coverage** -- Imports coverage via the [`sonarqube`](https://github.com/hpopp/mix-sonarqube) Hex package
 - **Syntax highlighting** -- Keywords, strings, atoms, numbers, doc attributes, and module attributes colored in the SonarQube code viewer
 
 ## Installation
@@ -64,34 +64,43 @@ sonar-scanner
 
 ## Coverage
 
-Elixir's built-in `:cover` tool produces `.coverdata` files. The included `tools/coverage.exs` script converts these to SonarQube's
-[generic coverage](https://docs.sonarsource.com/sonarqube/latest/analyzing-source-code/test-coverage/generic-test-data/) XML format.
+Coverage is handled by the [`sonarqube`](https://github.com/hpopp/mix-sonarqube) Hex package. Add it to your project:
 
-1. Run tests with coverage export.
-
-```shell
-mix test --cover --export-coverage default
+```elixir
+def deps do
+  [
+    {:sonarqube, "~> 0.1.0", only: [:dev, :test], runtime: false}
+  ]
+end
 ```
 
-2. Convert to SonarQube XML.
+Configure the cover tool in your `mix.exs`:
 
-```shell
-elixir tools/coverage.exs
+```elixir
+def project do
+  [
+    test_coverage: [tool: SonarQube.Coverage]
+  ]
+end
 ```
 
-This reads `cover/default.coverdata` and writes `cover/sonar-coverage.xml`.
+Run coverage:
 
-3. Add the coverage path to your `sonar-project.properties`:
+```shell
+mix sonarqube.coverage
+```
+
+This produces `cover/sonar-coverage.xml`. Add it to your `sonar-project.properties`:
 
 ```properties
 sonar.coverageReportPaths=cover/sonar-coverage.xml
 ```
 
-4. Run `sonar-scanner` as usual.
+Then run `sonar-scanner` as usual.
 
 ## CI Integration
 
-A typical CI pipeline needs Elixir (for tests and coverage conversion) and `sonar-scanner` (Java-based). The full sequence:
+A typical CI pipeline needs Elixir (for tests and coverage) and `sonar-scanner` (Java-based). The full sequence:
 
 ```yaml
 # Example GitHub Actions steps
@@ -99,10 +108,7 @@ A typical CI pipeline needs Elixir (for tests and coverage conversion) and `sona
   run: mix deps.get
 
 - name: Run tests with coverage
-  run: mix test --cover --export-coverage default
-
-- name: Convert coverage to SonarQube format
-  run: elixir tools/coverage.exs
+  run: mix sonarqube.coverage
 
 - name: Run SonarQube scanner
   run: sonar-scanner
@@ -111,24 +117,25 @@ A typical CI pipeline needs Elixir (for tests and coverage conversion) and `sona
     SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 ```
 
-The `tools/coverage.exs` script is included in the plugin JAR and also available in this repository under `tools/`. Copy it into your project or reference it from a local clone.
-
 ## Rules
 
 ### Code Smells
 
-| Key  | Name             | Description                               | Severity | Default |
-| ---- | ---------------- | ----------------------------------------- | -------- | :-----: |
-| S001 | MissingModuledoc | Modules should have `@moduledoc`          | Minor    |    ✓    |
-| S002 | LargeModule      | Modules should not have too many lines    | Minor    |         |
-| S003 | PipeChainStart   | Pipe chains should start with a raw value | Minor    |         |
-| S004 | IoInspect        | `IO.inspect` calls should be removed      | Major    |    ✓    |
+| Key                      | Description                                    | Severity | Default |
+| ------------------------ | ---------------------------------------------- | -------- | :-----: |
+| `function_names`         | Function names should be in snake_case         | Minor    |    ✓    |
+| `io_inspect`             | `IO.inspect` calls should be removed           | Major    |    ✓    |
+| `large_module`           | Modules should not have too many lines         | Minor    |         |
+| `missing_moduledoc`      | Modules should have `@moduledoc`               | Minor    |    ✓    |
+| `module_attribute_names` | Module attribute names should be in snake_case | Minor    |    ✓    |
+| `module_names`           | Module names should be in PascalCase           | Minor    |    ✓    |
+| `pipe_chain_start`       | Pipe chains should start with a raw value      | Minor    |         |
 
 ### Vulnerabilities
 
-| Key  | Name            | Description                         | Severity | Default |
-| ---- | --------------- | ----------------------------------- | -------- | :-----: |
-| S201 | HardcodedSecret | Credentials should not be hardcoded | Blocker  |    ✓    |
+| Key                | Description                         | Severity | Default |
+| ------------------ | ----------------------------------- | -------- | :-----: |
+| `hardcoded_secret` | Credentials should not be hardcoded | Blocker  |    ✓    |
 
 Rules marked with ✓ in **Default** are active in the built-in "Elixir Way" quality profile. All rules can be individually enabled or disabled in SonarQube's quality profile settings.
 

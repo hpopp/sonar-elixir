@@ -11,7 +11,7 @@ class HardcodedSecretRuleTest {
 
     @Test
     void ruleKey() {
-        assertThat(rule.ruleKey()).isEqualTo("S201");
+        assertThat(rule.ruleKey()).isEqualTo("hardcoded_secret");
     }
 
     @Test

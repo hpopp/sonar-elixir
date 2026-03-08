@@ -1,0 +1,32 @@
+<p>
+  Module names should always be written in <code>PascalCase</code> in Elixir.
+  Each segment of a dotted module name should start with an uppercase letter and
+  contain only letters and digits (no underscores).
+</p>
+
+<h2>Noncompliant Code Example</h2>
+<pre>
+defmodule MyApp.Web_searchController do
+  # ...
+end
+
+defmodule MyApp.Foo_bar do
+  # ...
+end
+</pre>
+
+<h2>Compliant Solution</h2>
+<pre>
+defmodule MyApp.WebSearchController do
+  # ...
+end
+
+defmodule MyApp.FooBar do
+  # ...
+end
+</pre>
+
+<h2>See</h2>
+<ul>
+  <li>Credo: <code>Credo.Check.Readability.ModuleNames</code></li>
+</ul>

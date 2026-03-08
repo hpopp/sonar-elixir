@@ -1,0 +1,40 @@
+<p>
+  Function, macro, and guard names should always be written in
+  <code>snake_case</code> in Elixir. Consistent naming improves readability and
+  follows community conventions.
+</p>
+
+<h2>Noncompliant Code Example</h2>
+<pre>
+def handleIncomingMessage(message) do
+  # ...
+end
+
+defp processData(data) do
+  # ...
+end
+
+defmacro myMacro(arg) do
+  # ...
+end
+</pre>
+
+<h2>Compliant Solution</h2>
+<pre>
+def handle_incoming_message(message) do
+  # ...
+end
+
+defp process_data(data) do
+  # ...
+end
+
+defmacro my_macro(arg) do
+  # ...
+end
+</pre>
+
+<h2>See</h2>
+<ul>
+  <li>Credo: <code>Credo.Check.Readability.FunctionNames</code></li>
+</ul>
