@@ -9,7 +9,7 @@ class LargeModuleRuleTest {
 
     @Test
     void ruleKey() {
-        assertThat(new LargeModuleRule().ruleKey()).isEqualTo("S002");
+        assertThat(new LargeModuleRule().ruleKey()).isEqualTo("large_module");
     }
 
     @Test

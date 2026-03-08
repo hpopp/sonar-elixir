@@ -17,11 +17,14 @@ public interface ElixirRule {
 
   static List<ElixirRule> allRules() {
     return List.of(
-      new MissingModuledocRule(),
-      new LargeModuleRule(),
-      new PipeChainStartRule(),
+      new FunctionNameRule(),
+      new HardcodedSecretRule(),
       new IoInspectRule(),
-      new HardcodedSecretRule()
+      new LargeModuleRule(),
+      new MissingModuledocRule(),
+      new ModuleAttributeNameRule(),
+      new ModuleNameRule(),
+      new PipeChainStartRule()
     );
   }
 }

@@ -11,31 +11,23 @@ public class ElixirRulesDefinition implements RulesDefinition {
 
   private static final List<RuleDefinition> RULES = List.of(
     new RuleDefinition(
-      "S001",
-      "Modules should have a @moduledoc attribute",
-      "Add @moduledoc to document this module's purpose",
+      "function_names",
+      "Function names should be written in snake_case",
+      "Rename this function to use snake_case",
       "CODE_SMELL",
       "MINOR",
       true
     ),
     new RuleDefinition(
-      "S002",
-      "Modules should not have too many lines",
-      "Split large modules into smaller, focused modules",
-      "CODE_SMELL",
-      "MINOR",
-      false
+      "hardcoded_secret",
+      "Credentials should not be hardcoded",
+      "Use environment variables or runtime configuration for secrets",
+      "VULNERABILITY",
+      "BLOCKER",
+      true
     ),
     new RuleDefinition(
-      "S003",
-      "Pipe chains should start with a raw value",
-      "Use a variable or literal as the first element of a pipe chain",
-      "CODE_SMELL",
-      "MINOR",
-      false
-    ),
-    new RuleDefinition(
-      "S004",
+      "io_inspect",
       "IO.inspect calls should be removed",
       "Remove debugging IO.inspect calls before committing",
       "CODE_SMELL",
@@ -43,12 +35,44 @@ public class ElixirRulesDefinition implements RulesDefinition {
       true
     ),
     new RuleDefinition(
-      "S201",
-      "Credentials should not be hardcoded",
-      "Use environment variables or runtime configuration for secrets",
-      "VULNERABILITY",
-      "BLOCKER",
+      "large_module",
+      "Modules should not have too many lines",
+      "Split large modules into smaller, focused modules",
+      "CODE_SMELL",
+      "MINOR",
+      false
+    ),
+    new RuleDefinition(
+      "module_names",
+      "Module names should be written in PascalCase",
+      "Rename this module to use PascalCase",
+      "CODE_SMELL",
+      "MINOR",
       true
+    ),
+    new RuleDefinition(
+      "missing_moduledoc",
+      "Modules should have a @moduledoc attribute",
+      "Add @moduledoc to document this module's purpose",
+      "CODE_SMELL",
+      "MINOR",
+      true
+    ),
+    new RuleDefinition(
+      "module_attribute_names",
+      "Module attribute names should be written in snake_case",
+      "Rename this module attribute to use snake_case",
+      "CODE_SMELL",
+      "MINOR",
+      true
+    ),
+    new RuleDefinition(
+      "pipe_chain_start",
+      "Pipe chains should start with a raw value",
+      "Use a variable or literal as the first element of a pipe chain",
+      "CODE_SMELL",
+      "MINOR",
+      false
     )
   );
 

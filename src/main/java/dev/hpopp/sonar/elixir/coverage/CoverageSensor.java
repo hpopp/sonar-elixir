@@ -23,7 +23,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * Reads the coverage XML produced by tools/coverage.exs and reports
+ * Reads coverage XML produced by the sonarqube Hex package and reports
  * EXECUTABLE_LINES_DATA so SonarQube's coverage denominator matches
  * what Elixir's :cover module considers executable.
  *
