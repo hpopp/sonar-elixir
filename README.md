@@ -13,10 +13,10 @@
 
 ## Features
 
-- **Static analysis** -- Credo-inspired rules covering code smells, security vulnerabilities, and reliability bugs
-- **Metrics** -- Lines of code, comment lines, and executable line tracking
-- **Test coverage** -- Imports coverage via the [`sonarqube`](https://github.com/hpopp/mix-sonarqube) Hex package
-- **Syntax highlighting** -- Keywords, strings, atoms, numbers, doc attributes, and module attributes colored in the SonarQube code viewer
+- **Static analysis** -- Credo-inspired rules covering code smells, security vulnerabilities, and reliability bugs.
+- **Metrics** -- Lines of code and comment line counts.
+- **Test coverage** -- Imports coverage via the [`sonarqube`](https://github.com/hpopp/mix-sonarqube) Hex package.
+- **Syntax highlighting** -- Elixir-aware highlighting in the SonarQube code viewer.
 
 ## Installation
 
@@ -47,7 +47,9 @@ sonar.sources=lib
 sonar.tests=test
 sonar.sourceEncoding=UTF-8
 sonar.host.url=http://localhost:9000
-sonar.elixir.file.suffixes=.ex,.exs
+
+# Include if using mix-sonarqube for coverage reporting.
+sonar.coverageReportPaths=cover/sonar-coverage.xml
 ```
 
 Then run the scanner:
@@ -65,39 +67,7 @@ sonar-scanner
 
 ## Coverage
 
-Coverage is handled by the [`sonarqube`](https://github.com/hpopp/mix-sonarqube) Hex package. Add it to your project:
-
-```elixir
-def deps do
-  [
-    {:sonarqube, "~> 0.1.0", only: [:dev, :test], runtime: false}
-  ]
-end
-```
-
-Configure the cover tool in your `mix.exs`:
-
-```elixir
-def project do
-  [
-    test_coverage: [tool: SonarQube.Coverage]
-  ]
-end
-```
-
-Run coverage:
-
-```shell
-mix sonarqube.coverage
-```
-
-This produces `cover/sonar-coverage.xml`. Add it to your `sonar-project.properties`:
-
-```properties
-sonar.coverageReportPaths=cover/sonar-coverage.xml
-```
-
-Then run `sonar-scanner` as usual.
+Coverage is handled by the [`sonarqube`](https://github.com/hpopp/mix-sonarqube) Hex package. See its README for installation and setup instructions.
 
 ## CI Integration
 
