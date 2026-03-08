@@ -1,14 +1,15 @@
+# sonar-elixir
+
+> SonarQube plugin for static analysis of Elixir projects.
+
 [![CI](https://github.com/hpopp/sonar-elixir/actions/workflows/ci.yml/badge.svg)](https://github.com/hpopp/sonar-elixir/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-0.1.0-orange.svg)](https://github.com/hpopp/sonar-elixir/commits/main)
 [![License](https://img.shields.io/github/license/hpopp/sonar-elixir)](LICENSE)
 [![Last Updated](https://img.shields.io/github/last-commit/hpopp/sonar-elixir.svg)](https://github.com/hpopp/sonar-elixir/commits/main)
 
-# sonar-elixir
-
-SonarQube plugin for static analysis of Elixir projects.
-
 > [!NOTE]
-> This plugin is in early development. Only a subset of rules are currently implemented. Feedback, bug reports, and contributions are welcome.
+> This plugin is in early development. Only a subset of rules are currently implemented.
+> Feedback, bug reports, and contributions are welcome.
 
 ## Features
 
@@ -145,7 +146,7 @@ Rules marked with ✓ in **Default** are active in the built-in "Elixir Way" qua
 
 - Java 17+
 - Maven
-- Elixir 1.14+
+- Elixir 1.15+
 
 ### Build
 
